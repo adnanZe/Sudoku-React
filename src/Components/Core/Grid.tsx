@@ -3,7 +3,7 @@ import { getClassNamesForElement } from "../../services/gridService";
 import { GameState } from "./Core";
 
 interface GridProps {
-  gameState: GameState;
+  gameState: GameState[];
   onHandleSelectedCell(id: string): void;
   selectedCellId: string;
 }
@@ -14,18 +14,31 @@ const Grid: FC<GridProps> = (props) => {
     onHandleSelectedCell: handleSelectedCell,
     selectedCellId,
   } = props;
+
+  console.log(gameState);
+
   return (
     <section className="sudoku">
-      {gameState.values.map((value: string, index: number) => (
-        <div
-          key={index}
-          id={gameState.ids[index]}
-          className={getClassNamesForElement(gameState, index, selectedCellId)}
-          onClick={() => handleSelectedCell(index.toString())}
-        >
-          {value}
-        </div>
-      ))}
+      {gameState.map((cell: GameState, index: number) => {
+        let generateCellForNotes;
+        if (cell.isActiveNotes && Array.isArray(cell.value)) {
+          generateCellForNotes = cell.value.map((value: string) => (
+            <span>{value}</span>
+          ));
+        }
+        console.log(generateCellForNotes);
+
+        return (
+          <div
+            key={index}
+            id={cell.id}
+            className={getClassNamesForElement(cell, selectedCellId)}
+            onClick={() => handleSelectedCell(index.toString())}
+          >
+            {generateCellForNotes || cell.value}
+          </div>
+        );
+      })}
     </section>
   );
 };

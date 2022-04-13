@@ -1,9 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import {
-  extractIds,
   extractIsAssociated,
-  extractIsReadOnly,
-  generateValuesForSudoku,
+  extractIsMatchedNumber,
+  generateGameState,
 } from "../../services/coreService";
 import EraseButton from "./EraseButton";
 import Grid from "./Grid";
@@ -14,52 +13,75 @@ import Timer from "./Timer";
 import UndoButton from "./UndoButton";
 
 export interface GameState {
-  values: string[];
-  ids: string[];
-  isReadOnly: boolean[];
-  isAssociated: boolean[];
-}
-
-function generateGameState(): GameState {
-  const sudokuValues = generateValuesForSudoku();
-  return {
-    values: sudokuValues,
-    ids: extractIds(sudokuValues),
-    isReadOnly: extractIsReadOnly(sudokuValues),
-    isAssociated: extractIsAssociated("0", sudokuValues),
-  };
+  value: string | string[];
+  id: string;
+  isReadOnly: boolean;
+  isAssociated: boolean;
+  isMatchNumber: boolean;
+  isActiveNotes: boolean;
 }
 
 const Core = () => {
   const selectedCellId = useRef<string>("0");
+  const [activeNotes, setActiveNotes] = useState<boolean>(false);
+  const [gameState, setGameState] = useState<GameState[]>(generateGameState);
 
-  const [gameState, setGameState] = useState<GameState>(generateGameState);
-
-  function handleNewGameOnDemand(): void {
-    const newGameState = generateGameState();
-    setGameState(newGameState);
+  function handleNewGameRequest(): void {
+    const newGameState: GameState[] = generateGameState();
     selectedCellId.current = "0";
-    handleAssociation();
+    setGameState(newGameState);
+    checkAssociation();
   }
 
   function handleSelectCell(id: string): void {
     selectedCellId.current = id;
-    handleAssociation();
-  }
+    checkAssociation();
 
-  function handleAssociation(): void {
-    gameState.isAssociated = extractIsAssociated(
-      selectedCellId.current,
-      gameState.values
-    );
-    const copyGameState = { ...gameState };
-    setGameState(copyGameState);
+    checkMatchNumber(gameState[Number(selectedCellId.current)].value);
   }
 
   function handleAddNumber(value: string): void {
-    gameState.values[Number(selectedCellId.current)] = value;
-    const copyGameState = { ...gameState };
+    let selectedCell = gameState[Number(selectedCellId.current)];
+
+    if (selectedCell.isReadOnly) return;
+
+    if (activeNotes) {
+      handleNotes(selectedCell, value);
+    } else {
+      selectedCell.isActiveNotes = false;
+      selectedCell.value = value;
+    }
+    const copyGameState = [...gameState];
     setGameState(copyGameState);
+    checkMatchNumber(selectedCell.value);
+  }
+
+  function handleNotes(selectedCell: GameState, value: string) {
+    if (!selectedCell.isActiveNotes) {
+      selectedCell.isActiveNotes = true;
+      let notesValues: string[] = [];
+      notesValues.length = 9;
+      notesValues.fill("");
+      selectedCell.value = notesValues;
+      selectedCell.value[Number(value) - 1] = value;
+    } else if (Array.isArray(selectedCell.value)) {
+      selectedCell.value[Number(value) - 1] = value;
+    }
+  }
+
+  function checkAssociation(): void {
+    gameState.forEach((cell: GameState) => {
+      cell.isAssociated = extractIsAssociated(selectedCellId.current, cell.id);
+    });
+    const copyGameState = [...gameState];
+    setGameState(copyGameState);
+  }
+
+  function checkMatchNumber(value: string | string[]): void {
+    if (Array.isArray(value)) return;
+    gameState.forEach((cell: GameState) => {
+      cell.isMatchNumber = extractIsMatchedNumber(cell.value, value);
+    });
   }
 
   return (
@@ -70,10 +92,10 @@ const Core = () => {
         selectedCellId={selectedCellId.current}
       />
       <section className="action-controls">
-        <NewGameButton onNewGameRequest={handleNewGameOnDemand} />
+        <NewGameButton onNewGameRequest={handleNewGameRequest} />
         <UndoButton />
         <EraseButton />
-        <NotesButton />
+        <NotesButton onAddNotes={setActiveNotes} isActiveNotes={activeNotes} />
         <NumbersButtons onAddNumber={handleAddNumber} />
       </section>
       <Timer />
