@@ -1,31 +1,31 @@
-import { GameState } from "../Components/Core/Core";
+import { GameState } from '../Components/Core/Core';
 
 export function getClassNamesForElement(
   cell: GameState,
   selectedCellId: string
 ) {
-  let className = "";
+  let className = '';
 
   if (cell.isReadOnly) {
-    className += "generated ";
+    className += 'generated ';
   }
   if (selectedCellId == cell.id) {
-    className += "active ";
+    className += 'active ';
   }
 
   if (cell.isAssociated) {
-    className += "associated ";
+    className += 'associated ';
   }
-  if (cell.isActiveNotes) {
-    return (className += "display-notes");
+  if (Array.isArray(cell.value)) {
+    return (className += 'display-notes');
   }
 
   if (cell.isMatchNumber) {
-    className += "match-number ";
+    className += 'match-number ';
   }
 
-  if (className.includes("match-number") && className.includes("associated")) {
-    className += "wrong ";
+  if (className.includes('match-number') && className.includes('associated')) {
+    className += 'wrong ';
   }
 
   return className;

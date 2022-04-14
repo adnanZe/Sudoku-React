@@ -19,7 +19,7 @@ const Grid: FC<GridProps> = (props) => {
     <section className="sudoku">
       {gameState.map((cell: GameState, index: number) => {
         let generateCellForNotes;
-        if (cell.isActiveNotes && Array.isArray(cell.value)) {
+        if (Array.isArray(cell.value)) {
           generateCellForNotes = cell.value.map((value: string) => (
             <span key={Math.random()}>{value}</span>
           ));

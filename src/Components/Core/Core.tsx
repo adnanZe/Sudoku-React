@@ -1,16 +1,16 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState } from 'react';
 import {
   extractIsAssociated,
   extractIsMatchedNumber,
   generateGameState,
-} from "../../services/coreService";
-import EraseButton from "./EraseButton";
-import Grid from "./Grid";
-import NewGameButton from "./NewGameButton";
-import NotesButton from "./NotesButton";
-import NumbersButtons from "./NumbersButtons";
-import Timer from "./Timer";
-import UndoButton from "./UndoButton";
+} from '../../services/coreService';
+import EraseButton from './EraseButton';
+import Grid from './Grid';
+import NewGameButton from './NewGameButton';
+import NotesButton from './NotesButton';
+import NumbersButtons from './NumbersButtons';
+import Timer from './Timer';
+import UndoButton from './UndoButton';
 
 export interface GameState {
   value: string | string[];
@@ -18,18 +18,18 @@ export interface GameState {
   isReadOnly: boolean;
   isAssociated: boolean;
   isMatchNumber: boolean;
-  isActiveNotes: boolean;
 }
 
 const Core = () => {
-  const selectedCellId = useRef<string>("0");
+  // todo: useState
+  const selectedCellId = useRef<string>('0');
   const [activeNotes, setActiveNotes] = useState<boolean>(false);
   const [gameState, setGameState] = useState<GameState[]>(generateGameState);
   const [memento, setMemento] = useState<GameState[]>([]);
 
   function handleNewGameRequest(): void {
     const newGameState: GameState[] = generateGameState();
-    selectedCellId.current = "0";
+    selectedCellId.current = '0';
     setGameState(newGameState);
     checkAssociation();
   }
@@ -46,52 +46,44 @@ const Core = () => {
 
     if (selectedCell.isReadOnly) return;
 
-    const newMemento: GameState = Object.assign({}, selectedCell);
+    const mementoValue = Array.isArray(selectedCell.value)
+      ? [...selectedCell.value]
+      : selectedCell.value;
 
-    setMemento([...memento, newMemento]);
+    setMemento([...memento, { ...selectedCell, value: mementoValue }]);
 
     if (activeNotes) {
       handleNotes(selectedCell, value);
     } else {
-      selectedCell.isActiveNotes = false;
       selectedCell.value = value;
     }
-    const copyGameState = [...gameState];
-    setGameState(copyGameState);
+
     checkMatchNumber(selectedCell.value);
+    setGameState([...gameState]);
   }
 
   function handleNotes(selectedCell: GameState, value: string) {
-    if (!selectedCell.isActiveNotes) {
-      selectedCell.isActiveNotes = true;
-      let notesValues: string[] = [];
-      notesValues.length = 9;
-      notesValues.fill("");
-      selectedCell.value = notesValues;
+    if (Array.isArray(selectedCell.value)) {
       selectedCell.value[Number(value) - 1] = value;
-    } else if (Array.isArray(selectedCell.value)) {
+    } else {
+      selectedCell.value = Array(9).fill('');
       selectedCell.value[Number(value) - 1] = value;
     }
   }
 
   function handleUndo(): void {
     const lastCell: GameState = memento[memento.length - 1];
-    // const copyOfMemento = [...memento];
     gameState[Number(lastCell.id)] = lastCell;
-
-    const copyGameState = [...gameState];
-    console.log(memento);
-
-    setGameState(copyGameState);
     memento.pop();
+
+    setGameState([...gameState]);
   }
 
   function checkAssociation(): void {
     gameState.forEach((cell: GameState) => {
       cell.isAssociated = extractIsAssociated(selectedCellId.current, cell.id);
     });
-    const copyGameState = [...gameState];
-    setGameState(copyGameState);
+    setGameState([...gameState]);
   }
 
   function checkMatchNumber(value: string | string[]): void {

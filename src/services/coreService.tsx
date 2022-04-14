@@ -1,36 +1,17 @@
-import { makepuzzle as generateNumbers } from "sudoku";
-import { GameState } from "../Components/Core/Core";
+import { makepuzzle as generateNumbers } from 'sudoku';
+import { GameState } from '../Components/Core/Core';
 
 export function generateValuesForSudoku(): string[] {
   const unIncrementedValues: number[] = generateNumbers();
   const incrementedValues = unIncrementedValues.map<string>((number: number) =>
-    number == null ? "" : `${number + 1}`
+    number == null ? '' : `${number + 1}`
   );
 
   return incrementedValues;
 }
 
-export function extractIds(sudokuValues: string[]): string[] {
-  let ids: string[] = [];
-  sudokuValues.forEach((value: string, index: number) => {
-    ids.push(index.toString());
-  });
-
-  return ids;
-}
-
-export function extractIsReadOnly(sudokuValues: string[]): boolean[] {
-  let isReadsOnly: boolean[] = [];
-  sudokuValues.forEach((value: string) => {
-    if (value) {
-      isReadsOnly.push(true);
-    } else {
-      isReadsOnly.push(false);
-    }
-  });
-  return isReadsOnly;
-}
-
+// generate only once, set it somewhere and reuse it
+// change return type
 function returnIdsRowsColumnsSquares(): string[][][] {
   const rows: Array<string[]> = [];
   const columns: Array<string[]> = [];
@@ -73,6 +54,7 @@ export function extractIsAssociated(
   selectedCellId: string,
   id: string
 ): boolean {
+  // TODO: do something about this!!!
   const [
     rowsId,
     columnsId,
@@ -96,6 +78,7 @@ export function extractIsAssociated(
   return isAssociatedIds;
 }
 
+// move into generateValuesForSudoku. can also rename to generateSudokuCellStates
 export function generateGameState(): GameState[] {
   const sudokuValues = generateValuesForSudoku();
 
@@ -110,7 +93,7 @@ export function generateGameState(): GameState[] {
       value: sudokuValues[index],
       id: index.toString(),
       isReadOnly: value ? true : false,
-      isAssociated: extractIsAssociated("0", index.toString()),
+      isAssociated: extractIsAssociated('0', index.toString()),
       isMatchNumber: extractIsMatchedNumber(value, valueIndexZero),
       isActiveNotes: false,
     };
