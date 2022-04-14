@@ -15,18 +15,15 @@ const Grid: FC<GridProps> = (props) => {
     selectedCellId,
   } = props;
 
-  console.log(gameState);
-
   return (
     <section className="sudoku">
       {gameState.map((cell: GameState, index: number) => {
         let generateCellForNotes;
         if (cell.isActiveNotes && Array.isArray(cell.value)) {
           generateCellForNotes = cell.value.map((value: string) => (
-            <span>{value}</span>
+            <span key={Math.random()}>{value}</span>
           ));
         }
-        console.log(generateCellForNotes);
 
         return (
           <div

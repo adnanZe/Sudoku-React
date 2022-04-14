@@ -1,8 +1,13 @@
-import React from "react";
+import React, { FC } from "react";
 
-const Undo = () => {
+interface Undo {
+  onUndo(): void;
+}
+
+const Undo: FC<Undo> = (props) => {
+  const { onUndo } = props;
   return (
-    <button id="undo" className="undo">
+    <button id="undo" className="undo" onClick={onUndo}>
       <i className="fa-solid fa-rotate-left"></i>
     </button>
   );

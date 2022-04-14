@@ -25,6 +25,7 @@ const Core = () => {
   const selectedCellId = useRef<string>("0");
   const [activeNotes, setActiveNotes] = useState<boolean>(false);
   const [gameState, setGameState] = useState<GameState[]>(generateGameState);
+  const [memento, setMemento] = useState<GameState[]>([]);
 
   function handleNewGameRequest(): void {
     const newGameState: GameState[] = generateGameState();
@@ -44,6 +45,10 @@ const Core = () => {
     let selectedCell = gameState[Number(selectedCellId.current)];
 
     if (selectedCell.isReadOnly) return;
+
+    const newMemento: GameState = Object.assign({}, selectedCell);
+
+    setMemento([...memento, newMemento]);
 
     if (activeNotes) {
       handleNotes(selectedCell, value);
@@ -67,6 +72,18 @@ const Core = () => {
     } else if (Array.isArray(selectedCell.value)) {
       selectedCell.value[Number(value) - 1] = value;
     }
+  }
+
+  function handleUndo(): void {
+    const lastCell: GameState = memento[memento.length - 1];
+    // const copyOfMemento = [...memento];
+    gameState[Number(lastCell.id)] = lastCell;
+
+    const copyGameState = [...gameState];
+    console.log(memento);
+
+    setGameState(copyGameState);
+    memento.pop();
   }
 
   function checkAssociation(): void {
@@ -93,7 +110,7 @@ const Core = () => {
       />
       <section className="action-controls">
         <NewGameButton onNewGameRequest={handleNewGameRequest} />
-        <UndoButton />
+        <UndoButton onUndo={handleUndo} />
         <EraseButton />
         <NotesButton onAddNotes={setActiveNotes} isActiveNotes={activeNotes} />
         <NumbersButtons onAddNumber={handleAddNumber} />

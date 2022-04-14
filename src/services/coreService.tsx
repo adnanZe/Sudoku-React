@@ -131,24 +131,3 @@ export function extractIsMatchedNumber(
     return (isMatchValue = false);
   }
 }
-
-// function testNotes(){
-//   let selectedCell = gameState[Number(selectedCellId.current)];
-//   if (activeNotes) {
-//     if (Array.isArray(selectedCell.value) && selectedCell.value.length == 0) {
-//       let notesValues: string[] = [];
-//       notesValues.length = 9;
-//       notesValues.fill("");
-//       notesValues[Number(value) - 1] = value;
-//       selectedCell.value = notesValues;
-//     } else if (
-//       Array.isArray(selectedCell.value && selectedCell.value.length)
-//     ) {
-//       selectedCell.value.splice(Number(value) - 1, 1, value);
-//     }
-
-//     console.log(gameState);
-//   } else {
-//     selectedCell.value = value;
-//   }
-// }
