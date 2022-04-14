@@ -1,16 +1,16 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState } from "react";
 import {
-  extractIsAssociated,
+  returnIsAssociated,
   extractIsMatchedNumber,
   generateGameState,
-} from '../../services/coreService';
-import EraseButton from './EraseButton';
-import Grid from './Grid';
-import NewGameButton from './NewGameButton';
-import NotesButton from './NotesButton';
-import NumbersButtons from './NumbersButtons';
-import Timer from './Timer';
-import UndoButton from './UndoButton';
+} from "../../Services/CoreService";
+import EraseButton from "./EraseButton";
+import Grid from "./Grid";
+import NewGameButton from "./NewGameButton";
+import NotesButton from "./NotesButton";
+import NumbersButtons from "./NumbersButtons";
+import Timer from "./Timer";
+import UndoButton from "./UndoButton";
 
 export interface GameState {
   value: string | string[];
@@ -20,16 +20,16 @@ export interface GameState {
   isMatchNumber: boolean;
 }
 
-const Core = () => {
+function Core() {
   // todo: useState
-  const selectedCellId = useRef<string>('0');
+  const selectedCellId = useRef<string>("0");
   const [activeNotes, setActiveNotes] = useState<boolean>(false);
   const [gameState, setGameState] = useState<GameState[]>(generateGameState);
   const [memento, setMemento] = useState<GameState[]>([]);
 
   function handleNewGameRequest(): void {
     const newGameState: GameState[] = generateGameState();
-    selectedCellId.current = '0';
+    selectedCellId.current = "0";
     setGameState(newGameState);
     checkAssociation();
   }
@@ -66,7 +66,7 @@ const Core = () => {
     if (Array.isArray(selectedCell.value)) {
       selectedCell.value[Number(value) - 1] = value;
     } else {
-      selectedCell.value = Array(9).fill('');
+      selectedCell.value = Array(9).fill("");
       selectedCell.value[Number(value) - 1] = value;
     }
   }
@@ -81,7 +81,7 @@ const Core = () => {
 
   function checkAssociation(): void {
     gameState.forEach((cell: GameState) => {
-      cell.isAssociated = extractIsAssociated(selectedCellId.current, cell.id);
+      cell.isAssociated = returnIsAssociated(selectedCellId.current, cell.id);
     });
     setGameState([...gameState]);
   }
@@ -110,6 +110,6 @@ const Core = () => {
       <Timer />
     </main>
   );
-};
+}
 
 export default Core;

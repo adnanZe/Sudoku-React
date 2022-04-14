@@ -1,81 +1,14 @@
-import { makepuzzle as generateNumbers } from 'sudoku';
-import { GameState } from '../Components/Core/Core';
+import { makepuzzle as generateNumbers } from "sudoku";
+import { GameState } from "../Components/Core/Core";
+import { returnListOfIdsAssociated } from "./HelperCoreService";
 
 export function generateValuesForSudoku(): string[] {
   const unIncrementedValues: number[] = generateNumbers();
   const incrementedValues = unIncrementedValues.map<string>((number: number) =>
-    number == null ? '' : `${number + 1}`
+    number == null ? "" : `${number + 1}`
   );
 
   return incrementedValues;
-}
-
-// generate only once, set it somewhere and reuse it
-// change return type
-function returnIdsRowsColumnsSquares(): string[][][] {
-  const rows: Array<string[]> = [];
-  const columns: Array<string[]> = [];
-  const squares: Array<string[]> = [];
-
-  let counterColumn = -1;
-  let counterSquare = 0;
-  let row: string[] | null = null;
-  let column: string[] | null = null;
-  let square: string[] | null = null;
-
-  for (let i = 0; i < 81; i++) {
-    if (i % 9 == 0) {
-      counterColumn++;
-      row = [];
-      column = [];
-      square = [];
-
-      rows.push(row);
-      columns.push(column);
-      squares.push(square);
-    }
-
-    if (i % 27 == 0) {
-      counterSquare = 0;
-    } else if (i % 9 == 0) {
-      counterSquare -= 18;
-    } else if (i % 3 == 0) {
-      counterSquare += 6;
-    }
-    row!.push(String(i));
-    column!.push(String((i % 9) * 9 + counterColumn));
-    square!.push(String(i + counterSquare));
-  }
-
-  return [rows, columns, squares];
-}
-
-export function extractIsAssociated(
-  selectedCellId: string,
-  id: string
-): boolean {
-  // TODO: do something about this!!!
-  const [
-    rowsId,
-    columnsId,
-    squaresId,
-  ]: string[][][] = returnIdsRowsColumnsSquares();
-
-  const rowList: string[] | undefined = rowsId.find((row) =>
-    row.includes(selectedCellId)
-  );
-  const colList: string[] | undefined = columnsId.find((col) =>
-    col.includes(selectedCellId)
-  );
-  const sqrList: string[] | undefined = squaresId.find((sqr) =>
-    sqr.includes(selectedCellId)
-  );
-
-  const listOfIds: string[] = rowList!.concat(colList!, sqrList!);
-
-  const isAssociatedIds: boolean = listOfIds.includes(id) ? true : false;
-
-  return isAssociatedIds;
 }
 
 // move into generateValuesForSudoku. can also rename to generateSudokuCellStates
@@ -93,7 +26,7 @@ export function generateGameState(): GameState[] {
       value: sudokuValues[index],
       id: index.toString(),
       isReadOnly: value ? true : false,
-      isAssociated: extractIsAssociated('0', index.toString()),
+      isAssociated: returnIsAssociated("0", index.toString()),
       isMatchNumber: extractIsMatchedNumber(value, valueIndexZero),
       isActiveNotes: false,
     };
@@ -113,4 +46,13 @@ export function extractIsMatchedNumber(
   } else {
     return (isMatchValue = false);
   }
+}
+
+export function returnIsAssociated(
+  selectedCellId: string,
+  id: string
+): boolean {
+  const listOfIds: string[] = returnListOfIdsAssociated(selectedCellId);
+
+  return listOfIds.includes(id) ? true : false;
 }

@@ -1,11 +1,11 @@
-import React, { FC } from "react";
+import React from "react";
 
 interface NotesProps {
   isActiveNotes: boolean;
   onAddNotes: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const Notes: FC<NotesProps> = (props) => {
+function Notes(props: NotesProps) {
   const { onAddNotes, isActiveNotes: activeNotes } = props;
   return (
     <button
@@ -16,6 +16,6 @@ const Notes: FC<NotesProps> = (props) => {
       <i className="fa-solid fa-pencil"></i>
     </button>
   );
-};
+}
 
 export default Notes;

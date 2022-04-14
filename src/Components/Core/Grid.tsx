@@ -1,5 +1,5 @@
-import React, { FC } from "react";
-import { getClassNamesForElement } from "../../services/gridService";
+import React from "react";
+import { getClassNamesForElement } from "../../Services/GridService";
 import { GameState } from "./Core";
 
 interface GridProps {
@@ -8,7 +8,7 @@ interface GridProps {
   selectedCellId: string;
 }
 
-const Grid: FC<GridProps> = (props) => {
+function Grid(props: GridProps) {
   const {
     gameState,
     onHandleSelectedCell: handleSelectedCell,
@@ -38,6 +38,6 @@ const Grid: FC<GridProps> = (props) => {
       })}
     </section>
   );
-};
+}
 
 export default Grid;

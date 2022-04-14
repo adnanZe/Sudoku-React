@@ -1,6 +1,6 @@
 import React from "react";
 
-const Footer = () => {
+function Footer() {
   return (
     <footer>
       <a href="https://github.com/adnanZe/Sudoku-">
@@ -9,6 +9,6 @@ const Footer = () => {
       </a>
     </footer>
   );
-};
+}
 
 export default Footer;

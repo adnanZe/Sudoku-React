@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React from "react";
 
 const numberButtons: string[] = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
 
@@ -6,7 +6,7 @@ interface NumbersButtonsProps {
   onAddNumber(value: string): void;
 }
 
-const NumbersButtons: FC<NumbersButtonsProps> = (props) => {
+function NumbersButtons(props: NumbersButtonsProps) {
   return (
     <>
       {numberButtons.map((value: string) => (
@@ -20,6 +20,6 @@ const NumbersButtons: FC<NumbersButtonsProps> = (props) => {
       ))}
     </>
   );
-};
+}
 
 export default NumbersButtons;
