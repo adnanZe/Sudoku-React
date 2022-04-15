@@ -1,10 +1,22 @@
 import React from "react";
 
-function Timer() {
+interface TimerProps {
+  onStartTimer(): void;
+  time: number;
+  timeOn: boolean;
+}
+
+function Timer(props: TimerProps) {
+  const { onStartTimer, time, timeOn } = props;
   return (
-    <section className="timer">
-      <span>00:00:00</span>
-      <i className="fa-solid fa-pause"></i>
+    <section className="timer" onClick={onStartTimer}>
+      <span>{("0" + Math.floor((time / 60) % 60)).slice(-2)}:</span>
+      <span>{("0" + Math.floor(time % 60)).slice(-2)}</span>
+      {timeOn ? (
+        <i className="fa-solid fa-pause"></i>
+      ) : (
+        <i className="fa-solid fa-play"></i>
+      )}
     </section>
   );
 }

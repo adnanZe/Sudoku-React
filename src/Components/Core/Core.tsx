@@ -1,8 +1,7 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
-  returnIsAssociated,
-  extractIsMatchedNumber,
-  generateGameState,
+  generateSudokuCellStates,
+  returnIsMatchedNumber,
 } from "../../Services/CoreService";
 import EraseButton from "./EraseButton";
 import Grid from "./Grid";
@@ -15,35 +14,59 @@ import UndoButton from "./UndoButton";
 export interface GameState {
   value: string | string[];
   id: string;
+  isSelected: boolean;
   isReadOnly: boolean;
   isAssociated: boolean;
-  isMatchNumber: boolean;
+  isMatchValue: boolean;
+  isWrongValue: boolean;
+  associatedIds: string[];
 }
 
 function Core() {
-  // todo: useState
-  const selectedCellId = useRef<string>("0");
   const [activeNotes, setActiveNotes] = useState<boolean>(false);
-  const [gameState, setGameState] = useState<GameState[]>(generateGameState);
+  const [gameState, setGameState] = useState<GameState[]>(
+    generateSudokuCellStates
+  );
   const [memento, setMemento] = useState<GameState[]>([]);
+  const [time, setTime] = useState<number>(0);
+  const [timerOn, setTimerOn] = useState(true);
+
+  useEffect(() => {
+    checkAssociation();
+    checkMatchNumber();
+  }, []);
+
+  useEffect(() => {
+    let interval: null | ReturnType<typeof setInterval> = null;
+
+    if (timerOn) {
+      interval = setInterval(() => {
+        setTime((prevTime: any) => prevTime + 1);
+      }, 1000);
+    } else {
+      clearInterval(interval!);
+    }
+
+    return () => clearInterval(interval!);
+  }, [timerOn]);
 
   function handleNewGameRequest(): void {
-    const newGameState: GameState[] = generateGameState();
-    selectedCellId.current = "0";
-    setGameState(newGameState);
-    checkAssociation();
+    setGameState([...generateSudokuCellStates()]);
   }
 
   function handleSelectCell(id: string): void {
-    selectedCellId.current = id;
+    gameState.forEach((cell: GameState) => {
+      cell.isSelected = id == cell.id ? true : false;
+    });
+    setGameState([...gameState]);
     checkAssociation();
-
-    checkMatchNumber(gameState[Number(selectedCellId.current)].value);
+    checkMatchNumber();
+    checkWrongNumber();
   }
 
   function handleAddNumber(value: string): void {
-    let selectedCell = gameState[Number(selectedCellId.current)];
-
+    let selectedCell = gameState.find((cell) => cell.isSelected == true);
+    if (!selectedCell) return;
     if (selectedCell.isReadOnly) return;
 
     const mementoValue = Array.isArray(selectedCell.value)
@@ -57,9 +80,9 @@ function Core() {
     } else {
       selectedCell.value = value;
     }
-
-    checkMatchNumber(selectedCell.value);
     setGameState([...gameState]);
+    checkMatchNumber();
+    checkWrongNumber();
   }
 
   function handleNotes(selectedCell: GameState, value: string) {
@@ -72,42 +95,102 @@ function Core() {
   }
 
   function handleUndo(): void {
+    if (!memento.length) return;
     const lastCell: GameState = memento[memento.length - 1];
     gameState[Number(lastCell.id)] = lastCell;
+    gameState.forEach((cell: GameState) => {
+      cell.isSelected = lastCell.id == cell.id ? true : false;
+    });
     memento.pop();
 
     setGameState([...gameState]);
+
+    checkAssociation();
+    checkMatchNumber();
+    checkWrongNumber();
+  }
+
+  function handleErase(): void {
+    let selectedCell = gameState.find((cell) => cell.isSelected == true);
+    if (selectedCell!.isReadOnly) return;
+    selectedCell!.value = "";
+
+    const mementoValue = Array.isArray(selectedCell!.value)
+      ? [...selectedCell!.value]
+      : selectedCell!.value;
+
+    setMemento([...memento, { ...selectedCell!, value: mementoValue }]);
+
+    setGameState([...gameState]);
+    checkAssociation();
+    checkMatchNumber();
+    checkWrongNumber();
+  }
+
+  function handleTimer(): void {
+    setTimerOn(timerOn ? false : true);
   }
 
   function checkAssociation(): void {
-    gameState.forEach((cell: GameState) => {
-      cell.isAssociated = returnIsAssociated(selectedCellId.current, cell.id);
+    let selectedCell = gameState.find((cell) => cell.isSelected == true);
+
+    gameState.map((cell: GameState) => {
+      if (cell.associatedIds.includes(selectedCell!.id)) {
+        cell.isAssociated = true;
+      } else {
+        cell.isAssociated = false;
+      }
     });
+
     setGameState([...gameState]);
   }
 
-  function checkMatchNumber(value: string | string[]): void {
-    if (Array.isArray(value)) return;
-    gameState.forEach((cell: GameState) => {
-      cell.isMatchNumber = extractIsMatchedNumber(cell.value, value);
+  function checkMatchNumber(): void {
+    let selectedCell = gameState.find((cell) => cell.isSelected == true);
+
+    if (Array.isArray(selectedCell!.value)) return;
+
+    gameState.map((cell: GameState) => {
+      cell.isMatchValue = returnIsMatchedNumber(
+        cell.value,
+        selectedCell!.value
+      );
     });
+
+    setGameState([...gameState]);
+  }
+
+  function checkWrongNumber(): void {
+    gameState.forEach((cell: GameState) => {
+      cell.isWrongValue = false;
+      gameState.forEach((cellToCompare: GameState) => {
+        if (
+          cell.value == cellToCompare.value &&
+          cell.value &&
+          cellToCompare.value &&
+          cell.id !== cellToCompare.id &&
+          cellToCompare.associatedIds.includes(cell.id)
+        ) {
+          // cellToCompare.isWrongValue = true;
+          cell.isWrongValue = true;
+        }
+      });
+    });
+
+    setGameState([...gameState]);
   }
 
   return (
     <main>
-      <Grid
-        gameState={gameState}
-        onHandleSelectedCell={handleSelectCell}
-        selectedCellId={selectedCellId.current}
-      />
+      <Grid gameState={gameState} onHandleSelectedCell={handleSelectCell} />
       <section className="action-controls">
         <NewGameButton onNewGameRequest={handleNewGameRequest} />
         <UndoButton onUndo={handleUndo} />
-        <EraseButton />
+        <EraseButton onErase={handleErase} />
         <NotesButton onAddNotes={setActiveNotes} isActiveNotes={activeNotes} />
         <NumbersButtons onAddNumber={handleAddNumber} />
       </section>
-      <Timer />
+      <Timer onStartTimer={handleTimer} time={time} timeOn={timerOn} />
     </main>
   );
 }

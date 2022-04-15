@@ -2,57 +2,42 @@ import { makepuzzle as generateNumbers } from "sudoku";
 import { GameState } from "../Components/Core/Core";
 import { returnListOfIdsAssociated } from "./HelperCoreService";
 
-export function generateValuesForSudoku(): string[] {
+export function generateSudokuCellStates(): GameState[] {
   const unIncrementedValues: number[] = generateNumbers();
-  const incrementedValues = unIncrementedValues.map<string>((number: number) =>
-    number == null ? "" : `${number + 1}`
-  );
-
-  return incrementedValues;
-}
-
-// move into generateValuesForSudoku. can also rename to generateSudokuCellStates
-export function generateGameState(): GameState[] {
-  const sudokuValues = generateValuesForSudoku();
-
-  const gameState: GameState[] = [];
 
   let valueIndexZero: string;
-  sudokuValues.forEach((value: string, index: number) => {
+
+  const gameState = unIncrementedValues.map((number: number, index: number) => {
+    let value = number == null ? "" : `${number + 1}`;
+
     if (index == 0) {
       valueIndexZero = value;
     }
-    const cellProprieties = {
-      value: sudokuValues[index],
+
+    return {
+      value: value,
       id: index.toString(),
+      isSelected: index == 0 ? true : false,
       isReadOnly: value ? true : false,
-      isAssociated: returnIsAssociated("0", index.toString()),
-      isMatchNumber: extractIsMatchedNumber(value, valueIndexZero),
-      isActiveNotes: false,
+      isAssociated: index == 0 ? true : false,
+      isMatchValue: returnIsMatchedNumber(value, valueIndexZero),
+      isWrongValue: false,
+      associatedIds: returnListOfIdsAssociated(index.toString()),
     };
-    gameState.push(cellProprieties);
   });
+
   return gameState;
 }
 
-export function extractIsMatchedNumber(
+export function returnIsMatchedNumber(
   value: string | string[],
-  valueSelectedCell: string
+  valueSelectedCell: string | string[] | undefined
 ): boolean {
-  let isMatchValue: boolean;
   if (Array.isArray(value)) return false;
-  if (value == valueSelectedCell && valueSelectedCell && value) {
-    return (isMatchValue = true);
+
+  if (value == valueSelectedCell && value) {
+    return true;
   } else {
-    return (isMatchValue = false);
+    return false;
   }
-}
-
-export function returnIsAssociated(
-  selectedCellId: string,
-  id: string
-): boolean {
-  const listOfIds: string[] = returnListOfIdsAssociated(selectedCellId);
-
-  return listOfIds.includes(id) ? true : false;
 }

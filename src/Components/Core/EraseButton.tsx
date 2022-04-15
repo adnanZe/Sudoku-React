@@ -1,8 +1,13 @@
 import React from "react";
 
-function Erase() {
+interface EraseProps {
+  onErase(): void;
+}
+
+function Erase(props: EraseProps) {
+  const { onErase } = props;
   return (
-    <button id="erase" className="erase">
+    <button id="erase" className="erase" onClick={onErase}>
       <i className="fa-solid fa-eraser"></i>
     </button>
   );

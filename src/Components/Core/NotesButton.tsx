@@ -6,12 +6,12 @@ interface NotesProps {
 }
 
 function Notes(props: NotesProps) {
-  const { onAddNotes, isActiveNotes: activeNotes } = props;
+  const { onAddNotes, isActiveNotes } = props;
   return (
     <button
-      className={`notes ${activeNotes ? "on" : ""}`}
+      className={`notes ${isActiveNotes ? "on" : ""}`}
       id="notes"
-      onClick={() => onAddNotes(activeNotes ? false : true)}
+      onClick={() => onAddNotes(isActiveNotes ? false : true)}
     >
       <i className="fa-solid fa-pencil"></i>
     </button>
