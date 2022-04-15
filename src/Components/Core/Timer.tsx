@@ -5,7 +5,7 @@ interface TimerProps {
   time: number;
   timeOn: boolean;
 }
-
+let x: any;
 function Timer(props: TimerProps) {
   const { onStartTimer, time, timeOn } = props;
   return (

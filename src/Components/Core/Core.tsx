@@ -29,11 +29,10 @@ function Core() {
   );
   const [memento, setMemento] = useState<GameState[]>([]);
   const [time, setTime] = useState<number>(0);
-  const [timerOn, setTimerOn] = useState(true);
+  const [timerOn, setTimerOn] = useState<boolean>(true);
 
   useEffect(() => {
-    checkAssociation();
-    checkMatchNumber();
+    checkGameStateAndSet();
   }, []);
 
   useEffect(() => {
@@ -58,10 +57,7 @@ function Core() {
     gameState.forEach((cell: GameState) => {
       cell.isSelected = id == cell.id ? true : false;
     });
-    setGameState([...gameState]);
-    checkAssociation();
-    checkMatchNumber();
-    checkWrongNumber();
+    checkGameStateAndSet();
   }
 
   function handleAddNumber(value: string): void {
@@ -80,9 +76,7 @@ function Core() {
     } else {
       selectedCell.value = value;
     }
-    setGameState([...gameState]);
-    checkMatchNumber();
-    checkWrongNumber();
+    checkGameStateAndSet();
   }
 
   function handleNotes(selectedCell: GameState, value: string) {
@@ -103,17 +97,12 @@ function Core() {
     });
     memento.pop();
 
-    setGameState([...gameState]);
-
-    checkAssociation();
-    checkMatchNumber();
-    checkWrongNumber();
+    checkGameStateAndSet();
   }
 
   function handleErase(): void {
     let selectedCell = gameState.find((cell) => cell.isSelected == true);
     if (selectedCell!.isReadOnly) return;
-    selectedCell!.value = "";
 
     const mementoValue = Array.isArray(selectedCell!.value)
       ? [...selectedCell!.value]
@@ -121,14 +110,21 @@ function Core() {
 
     setMemento([...memento, { ...selectedCell!, value: mementoValue }]);
 
-    setGameState([...gameState]);
-    checkAssociation();
-    checkMatchNumber();
-    checkWrongNumber();
+    selectedCell!.value = "";
+
+    checkGameStateAndSet();
   }
 
   function handleTimer(): void {
     setTimerOn(timerOn ? false : true);
+  }
+
+  function checkGameStateAndSet(): void {
+    checkAssociation();
+    checkMatchNumber();
+    checkWrongNumber();
+
+    setGameState([...gameState]);
   }
 
   function checkAssociation(): void {
@@ -141,8 +137,6 @@ function Core() {
         cell.isAssociated = false;
       }
     });
-
-    setGameState([...gameState]);
   }
 
   function checkMatchNumber(): void {
@@ -156,8 +150,6 @@ function Core() {
         selectedCell!.value
       );
     });
-
-    setGameState([...gameState]);
   }
 
   function checkWrongNumber(): void {
@@ -171,13 +163,10 @@ function Core() {
           cell.id !== cellToCompare.id &&
           cellToCompare.associatedIds.includes(cell.id)
         ) {
-          // cellToCompare.isWrongValue = true;
           cell.isWrongValue = true;
         }
       });
     });
-
-    setGameState([...gameState]);
   }
 
   return (

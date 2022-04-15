@@ -5,7 +5,6 @@ import { GameState } from "./Core";
 interface GridProps {
   gameState: GameState[];
   onHandleSelectedCell(id: string): void;
-  // selectedCellId: string;
 }
 
 function Grid(props: GridProps) {
