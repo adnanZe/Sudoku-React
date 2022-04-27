@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   generateSudokuCellStates,
   getIsMatchedNumber,
@@ -49,9 +49,9 @@ function Core(): JSX.Element {
     return () => clearInterval(interval!);
   }, [timerOn]);
 
-  function handleNewGameRequest(): void {
-    setGameState([...generateSudokuCellStates()]);
-  }
+  const handleNewGameRequest = useCallback(() => {
+    setGameState(generateSudokuCellStates);
+  }, []);
 
   function handleSelectCell(id: string): void {
     gameState.forEach((cell: GameState) => {
