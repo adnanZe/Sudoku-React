@@ -5,7 +5,7 @@ interface NotesProps {
   onAddNotes: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-function Notes(props: NotesProps) {
+function Notes(props: NotesProps): JSX.Element {
   const { onAddNotes, isActiveNotes } = props;
   return (
     <button

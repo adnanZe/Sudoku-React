@@ -1,6 +1,6 @@
 import { GameState } from "../Components/Core/Core";
 
-export function getClassNamesForElement(cell: GameState) {
+export function getClassNamesForElement(cell: GameState): string {
   let className = "";
 
   if (cell.isReadOnly) {

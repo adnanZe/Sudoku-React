@@ -6,7 +6,7 @@ interface NumbersButtonsProps {
   onAddNumber(value: string): void;
 }
 
-function NumbersButtons(props: NumbersButtonsProps) {
+function NumbersButtons(props: NumbersButtonsProps): JSX.Element {
   return (
     <>
       {numberButtons.map((value: string) => (

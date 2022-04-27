@@ -1,6 +1,6 @@
 import { makepuzzle as generateNumbers } from "sudoku";
 import { GameState } from "../Components/Core/Core";
-import { returnListOfIdsAssociated } from "./HelperCoreService";
+import { getListOfIdsAssociated } from "./HelperCoreService";
 
 export function generateSudokuCellStates(): GameState[] {
   const unIncrementedValues: number[] = generateNumbers();
@@ -20,16 +20,16 @@ export function generateSudokuCellStates(): GameState[] {
       isSelected: index == 0 ? true : false,
       isReadOnly: value ? true : false,
       isAssociated: index == 0 ? true : false,
-      isMatchValue: returnIsMatchedNumber(value, valueIndexZero),
+      isMatchValue: getIsMatchedNumber(value, valueIndexZero),
       isWrongValue: false,
-      associatedIds: returnListOfIdsAssociated(index.toString()),
+      associatedIds: getListOfIdsAssociated(index.toString()),
     };
   });
 
   return gameState;
 }
 
-export function returnIsMatchedNumber(
+export function getIsMatchedNumber(
   value: string | string[],
   valueSelectedCell: string | string[] | undefined
 ): boolean {

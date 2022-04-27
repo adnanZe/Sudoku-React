@@ -1,7 +1,4 @@
-// generate only once, set it somewhere and reuse it
-// change return type
-
-interface returnRowsColumnsSquaresObj<T = Array<string[]>> {
+interface RowsColumnsSquaresObj<T = Array<string[]>> {
   rows: T;
   columns: T;
   squares: T;
@@ -9,8 +6,8 @@ interface returnRowsColumnsSquaresObj<T = Array<string[]>> {
 
 type rowColumnSquare = string[] | null;
 
-function returnIdsRowsColumnsSquares() {
-  const returnObject: returnRowsColumnsSquaresObj = {
+function getIdsRowsColumnsSquares() {
+  const RowColumnSqrObject: RowsColumnsSquaresObj = {
     rows: [],
     columns: [],
     squares: [],
@@ -29,9 +26,9 @@ function returnIdsRowsColumnsSquares() {
       column = [];
       square = [];
 
-      returnObject.rows.push(row);
-      returnObject.columns.push(column);
-      returnObject.squares.push(square);
+      RowColumnSqrObject.rows.push(row);
+      RowColumnSqrObject.columns.push(column);
+      RowColumnSqrObject.squares.push(square);
     }
 
     if (i % 27 == 0) {
@@ -46,12 +43,12 @@ function returnIdsRowsColumnsSquares() {
     square!.push(String(i + counterSquare));
   }
 
-  return returnObject;
+  return RowColumnSqrObject;
 }
 
-const idsRowsColumnsSquares = returnIdsRowsColumnsSquares();
+const idsRowsColumnsSquares = getIdsRowsColumnsSquares();
 
-export function returnListOfIdsAssociated(selectedCellId: string): string[] {
+export function getListOfIdsAssociated(selectedCellId: string): string[] {
   const { rows, columns, squares } = idsRowsColumnsSquares;
 
   const rowList: string[] | undefined = rows.find((row) =>

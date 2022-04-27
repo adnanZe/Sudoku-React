@@ -5,8 +5,7 @@ interface TimerProps {
   time: number;
   timeOn: boolean;
 }
-let x: any;
-function Timer(props: TimerProps) {
+function Timer(props: TimerProps): JSX.Element {
   const { onStartTimer, time, timeOn } = props;
   return (
     <section className="timer" onClick={onStartTimer}>

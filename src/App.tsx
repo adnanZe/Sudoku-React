@@ -3,7 +3,7 @@ import Core from "./Components/Core/Core";
 import Footer from "./Components/Layout/Footer";
 import Header from "./Components/Layout/Header";
 
-function App() {
+function App(): JSX.Element {
   return (
     <div className="App">
       <Header />

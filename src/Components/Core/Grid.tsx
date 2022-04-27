@@ -7,7 +7,7 @@ interface GridProps {
   onHandleSelectedCell(id: string): void;
 }
 
-function Grid(props: GridProps) {
+function Grid(props: GridProps): JSX.Element {
   const { gameState, onHandleSelectedCell } = props;
 
   return (

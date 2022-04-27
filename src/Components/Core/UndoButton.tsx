@@ -4,7 +4,7 @@ interface Undo {
   onUndo(): void;
 }
 
-function Undo(props: Undo) {
+function Undo(props: Undo): JSX.Element {
   const { onUndo } = props;
   return (
     <button id="undo" className="undo" onClick={onUndo}>

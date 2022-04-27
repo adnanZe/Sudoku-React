@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
   generateSudokuCellStates,
-  returnIsMatchedNumber,
+  getIsMatchedNumber,
 } from "../../Services/CoreService";
 import EraseButton from "./EraseButton";
 import Grid from "./Grid";
@@ -22,7 +22,7 @@ export interface GameState {
   associatedIds: string[];
 }
 
-function Core() {
+function Core(): JSX.Element {
   const [activeNotes, setActiveNotes] = useState<boolean>(false);
   const [gameState, setGameState] = useState<GameState[]>(
     generateSudokuCellStates
@@ -40,7 +40,7 @@ function Core() {
 
     if (timerOn) {
       interval = setInterval(() => {
-        setTime((prevTime: any) => prevTime + 1);
+        setTime((prevTime: number) => prevTime + 1);
       }, 1000);
     } else {
       clearInterval(interval!);
@@ -79,7 +79,7 @@ function Core() {
     checkGameStateAndSet();
   }
 
-  function handleNotes(selectedCell: GameState, value: string) {
+  function handleNotes(selectedCell: GameState, value: string): void {
     if (Array.isArray(selectedCell.value)) {
       selectedCell.value[Number(value) - 1] = value;
     } else {
@@ -145,10 +145,7 @@ function Core() {
     if (Array.isArray(selectedCell!.value)) return;
 
     gameState.map((cell: GameState) => {
-      cell.isMatchValue = returnIsMatchedNumber(
-        cell.value,
-        selectedCell!.value
-      );
+      cell.isMatchValue = getIsMatchedNumber(cell.value, selectedCell!.value);
     });
   }
 
